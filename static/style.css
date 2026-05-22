@@ -1,0 +1,472 @@
+:root {
+    --primary: #8b5cf6;
+    --primary-glow: rgba(139, 92, 246, 0.3);
+    --secondary: #3b82f6;
+    --accent: #10b981;
+    --bg-dark: #020617;
+    --surface: rgba(30, 41, 59, 0.6);
+    --surface-bright: rgba(51, 65, 85, 0.8);
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at top right, #1e1b4b, #020617);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.app-wrapper {
+    display: flex;
+    width: 95vw;
+    height: 90vh;
+    gap: 20px;
+    position: relative;
+}
+
+/* SIDEBAR STYLING */
+.sidebar {
+    width: 280px;
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #fff, var(--text-dim));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.sidebar-header p {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+}
+
+.activity-monitor {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.monitor-item {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.monitor-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.monitor-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* MAIN CHAT AREA */
+.main-container {
+    flex-grow: 1;
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.chat-window {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+.chat-window::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.message {
+    max-width: 75%;
+    padding: 16px 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    line-height: 1.5;
+    animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bot-message {
+    align-self: flex-start;
+    background: var(--surface-bright);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    color: #e2e8f0;
+}
+
+.user-message {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
+}
+
+.message.typing {
+    opacity: 0.7;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* INPUT AREA */
+.input-section {
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid var(--border);
+    position: relative;
+}
+
+.editor-wrapper {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.editor-wrapper:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+}
+
+textarea {
+    width: 100%;
+    min-height: 24px;
+    max-height: 120px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    resize: none;
+    z-index: 2;
+    position: relative;
+}
+
+.ghost-text {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+    pointer-events: none;
+    white-space: pre-wrap;
+    z-index: 1;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.send-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.send-btn:hover {
+    background: #7c3aed;
+    transform: scale(1.05);
+}
+
+.suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.suggestion-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestion-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* DIAGNOSTIC HUD */
+.hud-panel {
+    display: flex;
+    gap: 20px;
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.hud-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.hud-value {
+    font-size: 0.9rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--primary);
+}
+
+.sync-btn {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+    margin-top: 4px;
+}
+
+.sync-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.sync-btn:active {
+    transform: scale(0.95);
+}
+
+.info-overlay {
+    margin-top: auto;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
+/* Ambient Moving Mesh Glows */
+.ambient-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    z-index: -1;
+    opacity: 0.15;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+.glow-1 {
+    background: radial-gradient(circle, var(--primary), transparent 70%);
+    top: -20%;
+    left: -10%;
+    animation: floatGlow1 25s infinite alternate ease-in-out;
+}
+.glow-2 {
+    background: radial-gradient(circle, var(--secondary), transparent 70%);
+    bottom: -20%;
+    right: -10%;
+    animation: floatGlow2 30s infinite alternate ease-in-out;
+}
+.glow-3 {
+    background: radial-gradient(circle, var(--accent), transparent 70%);
+    top: 40%;
+    left: 50%;
+    animation: floatGlow3 28s infinite alternate ease-in-out;
+}
+
+@keyframes floatGlow1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 80px) scale(1.2); }
+}
+@keyframes floatGlow2 {
+    0% { transform: translate(0, 0) scale(1.1); }
+    100% { transform: translate(-120px, -60px) scale(0.9); }
+}
+@keyframes floatGlow3 {
+    0% { transform: translate(0, 0) scale(0.8); }
+    100% { transform: translate(-80px, 100px) scale(1.1); }
+}
+
+/* Glassmorphism Refinements */
+.sidebar, .main-container {
+    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.monitor-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Elastic Progress Bars */
+.bar-fill {
+    transition: width 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Active Brain Status Badges */
+.process-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.hud-value {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.status-standby {
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #94a3b8;
+    box-shadow: 0 0 10px rgba(148, 163, 184, 0.05);
+}
+
+.status-system1 {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.status-system2-rag {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.status-system2-llama3 {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #8b5cf6;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Neural Wave Activity Animation */
+.neural-wave {
+    display: flex;
+    align-items: center;
+    gap: 2.5px;
+    height: 12px;
+}
+
+.neural-wave span {
+    width: 2px;
+    height: 100%;
+    background: var(--primary);
+    border-radius: 1px;
+    animation: waveBounce 0.8s infinite ease-in-out;
+}
+
+.neural-wave span:nth-child(2) { animation-delay: 0.15s; background: var(--secondary); }
+.neural-wave span:nth-child(3) { animation-delay: 0.3s; background: var(--accent); }
+.neural-wave span:nth-child(4) { animation-delay: 0.45s; background: var(--primary); }
+.neural-wave span:nth-child(5) { animation-delay: 0.6s; background: var(--secondary); }
+
+.neural-wave.hidden {
+    display: none;
+}
+
+@keyframes waveBounce {
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1.2); }
+}
+
+/* Ghost text highlight color */
+.ghost-text {
+    color: rgba(6, 182, 212, 0.35); /* Soft cyan glow */
+    font-style: italic;
+}
+

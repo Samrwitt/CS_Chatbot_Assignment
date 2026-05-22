@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroSync | Cognitive AI Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Ambient background animated glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="app-wrapper">
+        <!-- Sidebar for Cognitive Analytics -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>NeuroSync</h2>
+                <p>Cognitive Science v2.5</p>
+            </div>
+
+            <div class="activity-monitor">
+                <div class="monitor-item">
+                    <span class="monitor-label">Linguistic Confidence</span>
+                    <div class="monitor-bar">
+                        <div id="confidence-bar" class="bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="monitor-item">
+                    <span class="monitor-label">Semantic Depth</span>
+                    <div class="monitor-bar">
+                        <div id="semantic-bar" class="bar-fill" style="width: 75%; background: var(--secondary)"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-panel">
+                <div class="hud-item">
+                    <span class="hud-label">Syntax (POS)</span>
+                    <span id="pos-val" class="hud-value">NONE</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Active Brain</span>
+                    <div class="process-wrapper">
+                        <span id="process-val" class="hud-value status-standby">STANDBY</span>
+                        <div id="neural-wave" class="neural-wave hidden">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hud-item">
+                    <button id="sync-btn" class="sync-btn" title="Re-index Knowledge Base">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        <span>Sync</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="info-overlay">
+                Developed for Cognitive Science studies. Simulating associative memory through hybrid N-gram and Neural Transformer architectures.
+            </div>
+        </aside>
+
+        <!-- Main Conversational Interface -->
+        <main class="main-container">
+            <div id="chat-window" class="chat-window">
+                <div class="message bot-message">
+                    Neural link established. I am your Cognitive Assistant, powered by a 5.5-million-word statistical core and Llama3 intelligence. How shall we begin?
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="suggestions" id="suggestions">
+                    <!-- Dynamic suggestions go here -->
+                </div>
+                
+                <div class="editor-wrapper">
+                    <div id="ghost-text" class="ghost-text"></div>
+                    <textarea id="text-input" placeholder="Type your thought..." rows="1"></textarea>
+                </div>
+
+                <div class="controls">
+                    <div class="hud-item">
+                        <span class="hud-label">Confidence Score</span>
+                        <span id="confidence-val" class="hud-value">0.0%</span>
+                    </div>
+                    <button id="send-btn" class="send-btn">
+                        <span>Send Message</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/static/script.js"></script>
+</body>
+</html>
