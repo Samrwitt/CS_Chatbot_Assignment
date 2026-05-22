@@ -4,3 +4,5 @@ requests
 pandas
 scikit-learn
 PyPDF2
+sentence-transformers
+torch
