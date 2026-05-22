@@ -50,26 +50,15 @@ Simulates how humans retrieve related concepts through associative memory.
   - Install on Linux: `curl -fsSL https://ollama.com/install.sh | sh`
   - Pull the model: `ollama pull llama3`
   - Start the service: `ollama serve` (Usually starts automatically after install)
+ 
+ ### How to Set it up 
 
-### Installation
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/RuhamaY/chatbot1.git
-   cd chatbot1
-   ```
-
-2. **Setup Virtual Environment**:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install Dependencies**:
+**Install Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Run the Application**:
+**Run the Application**:
    ```bash
    python3 app.py
    ```
