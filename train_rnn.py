@@ -116,8 +116,20 @@ def train():
         targets = targets[:max_train_sequences]
         print(f"Sub-sampled to {len(sequences)} sequences for fast local CPU training.")
         
-    dataset = CognitiveDataset(sequences, targets)
-    dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
+    # Split into train and validation sets (90% train, 10% val)
+    split_idx = int(len(sequences) * 0.9)
+    train_sequences = sequences[:split_idx]
+    train_targets = targets[:split_idx]
+    val_sequences = sequences[split_idx:]
+    val_targets = targets[split_idx:]
+    
+    print(f"Split data: {len(train_sequences)} training sequences, {len(val_sequences)} validation sequences.")
+    
+    train_dataset = CognitiveDataset(train_sequences, train_targets)
+    val_dataset = CognitiveDataset(val_sequences, val_targets)
+    
+    train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=128, shuffle=False)
     
     # Model parameters
     vocab_size = len(vocab)
@@ -132,10 +144,10 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.005)
     
-    model.train()
     for epoch in range(epochs):
+        model.train()
         epoch_loss = 0.0
-        for batch_seqs, batch_targets in dataloader:
+        for batch_seqs, batch_targets in train_loader:
             batch_seqs, batch_targets = batch_seqs.to(device), batch_targets.to(device)
             
             optimizer.zero_grad()
@@ -146,7 +158,37 @@ def train():
             
             epoch_loss += loss.item()
             
-        print(f"Epoch {epoch+1}/{epochs} | Loss: {epoch_loss/len(dataloader):.4f}")
+        # Validation Evaluation
+        model.eval()
+        val_loss = 0.0
+        val_correct_top1 = 0
+        val_correct_top5 = 0
+        total_val_samples = len(val_dataset)
+        
+        with torch.no_grad():
+            for batch_seqs, batch_targets in val_loader:
+                batch_seqs, batch_targets = batch_seqs.to(device), batch_targets.to(device)
+                outputs, _ = model(batch_seqs)
+                loss = criterion(outputs, batch_targets)
+                val_loss += loss.item() * batch_targets.size(0)
+                
+                # Top-1 accuracy
+                _, top1_preds = outputs.topk(1, dim=1)
+                val_correct_top1 += (top1_preds.squeeze(1) == batch_targets).sum().item()
+                
+                # Top-5 accuracy
+                _, top5_preds = outputs.topk(min(5, vocab_size), dim=1)
+                val_correct_top5 += sum([batch_targets[i].item() in top5_preds[i].tolist() for i in range(batch_targets.size(0))])
+                
+        val_loss /= total_val_samples
+        val_perplexity = torch.exp(torch.tensor(val_loss)).item()
+        val_acc_top1 = (val_correct_top1 / total_val_samples) * 100
+        val_acc_top5 = (val_correct_top5 / total_val_samples) * 100
+        
+        train_loss_avg = epoch_loss / len(train_loader)
+        print(f"Epoch {epoch+1:02d}/{epochs:02d} | Train Loss: {train_loss_avg:.4f} | "
+              f"Val Loss: {val_loss:.4f} | Val PPL: {val_perplexity:.2f} | "
+              f"Val Top-1 Acc: {val_acc_top1:.2f}% | Val Top-5 Acc: {val_acc_top5:.2f}%")
         
     # Save the trained model weights
     torch.save(model.state_dict(), 'app/rnn_model.pth')

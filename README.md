@@ -1,82 +1,86 @@
-#  NeuroSync
+# NeuroSync: Hybrid Cognitive Next-Word Prediction & RAG Chatbot
 
-NeuroSync is a chatbot with a feature that suggests the next word based on the user's input, making typing faster and easier. It is useful for increased typing speed, reduced errors, and improved communication efficiency. It simulates human-like linguistic processes through a combination of **statistical associative memory (System 1)** and **Retrieval-Augmented Generation (RAG) intelligence (System 2)**.
+NeuroSync is an advanced hybrid cognitive chatbot architecture that simulates human-like linguistic and reasoning processes. It combines a fast, reactive next-word predictor (**System 1**) with a slow, deliberate Retrieval-Augmented Generation (RAG) engine (**System 2**).
 
 ---
 
-##  Core Architecture
+## 🧠 Core Architecture
 
 The system operates on a dual-process cognitive model:
 
-### 1. The Statistical Brain (System 1)
-Inspired by the human brain's fast, intuitive pattern recognition.
-- **Interpolated N-Grams**: Uses a weighted combination of Unigram, Bigram, and Trigram models trained on over 1.6 million words from diverse corpora (Brown, Reuters, Gutenberg, etc.).
-- **Smoothing**: Implements linear interpolation to handle sparse data and ensure smooth transitions between contexts.
-- **Neuroplasticity (User Learning)**: The model dynamically adapts to your personal linguistic style in real-time. Every message you type strengthens specific neural pathways in the `user_model`.
+### 1. The Reactive Brain (System 1)
+Designed for fast, intuitive pattern recognition and next-word prediction. It consists of two complementary architectures:
+- **Connectionist RNN**: A PyTorch LSTM-based sequence predictor (`RNNWordPredictor`) trained on the domain-specific knowledge base text. It accepts context sequences of length 5 to predict the next token.
+- **Statistical N-Grams**: A fallback/complementary linear-interpolated n-gram model (Unigram, Bigram, Trigram) trained on multiple corpora (Brown, Gutenberg, Reuters, etc.) and domain-specific texts. It uses linear interpolation weights (Trigram: 0.6, Bigram: 0.3, Unigram: 0.1) for smoothing.
+- **WordNet Spreading Activation**: Simulates associative semantic retrieval by traversing the WordNet hierarchy (Synonyms, Hypernyms, and Hyponyms) to boost related candidate predictions.
+- **Incremental User Learning**: Dynamically adapts to the user's linguistic style by learning from sent messages in real-time and persisting patterns to `user_memory.json`.
 
-### 2. Retrieval-Augmented Generation (RAG)
-Provides the bot with a "Declarative Memory" or knowledge base.
-- **Multi-Format Support**: Automatically ingests `.txt` and `.pdf` files from the `knowledge/` directory.
-- **Semantic Retrieval**: Uses TF-IDF vectorization and Cosine Similarity to find the most relevant information for any user query.
-- **Contextual Augmentation**: Injects retrieved knowledge directly into the high-level dialogue model (System 2) for more accurate and grounded responses.
-
-### 3. Spreading Activation (Semantic Network)
-Simulates how humans retrieve related concepts through associative memory.
-- **WordNet Integration**: When predicting words, the model traverses the WordNet graph to find **Synonyms**, **Hypernyms** (general categories), and **Hyponyms** (specific instances).
-- **Activation Decay**: Uses an inverse square law to simulate the natural fading of mental associations as they move further from the core concept.
-
-### 4. High-Level Dialogue (System 2)
-- **Ollama Integration**: If a local Ollama instance is running (defaulting to `llama3`), the system can delegate complex reasoning and conversational flow to a Large Language Model.
-- **Graceful Fallback**: If System 2 is offline, the Statistical Brain takes over to maintain conversational continuity.
+### 2. The Analytical Brain (System 2)
+Provides high-level logical reasoning and contextual dialogue.
+- **Semantic Retrieval**: A dense retriever (`SimpleRetriever`) using a SentenceTransformer (`all-MiniLM-L6-v2`) and cosine similarity to fetch the most relevant knowledge base chunks for a user query.
+- **Contextual Augmentation**: Injects retrieved chunks into the prompt context for the local Large Language Model.
+- **Ollama LLM Reasoning**: Delegates high-level response generation to a local Ollama instance (defaulting to `llama3`).
+- **Graceful Fallback**: If the Ollama service is offline, System 1 automatically takes over to generate responses stochastically.
 
 ---
 
-##  Features
+## ⚙️ Project Structure & Flow
 
-- **Long-Term Memory Persistence**: All user-learned patterns are saved to `user_memory.json` and reloaded on startup.
-- **Real-Time Diagnostics**:
-  - **Linguistic Confidence**: Measures the statistical certainty of the next word prediction.
-  - **Syntax Analysis**: Real-time Part-of-Speech (POS) tagging of user input.
-  - **Process Monitor**: Identifies which part of the "brain" is currently generating the response.
-- **Autocomplete & Ghost Text**: A premium UI experience providing predictive text completions (Tab/ArrowRight to accept).
+- `run.py`: Entry point for launching the Flask web service (running on port 5005).
+- `train_rnn.py`: CLI training script to extract text from `knowledge/`, build the vocabulary, split sequences into train/validation sets, train the LSTM network, and save weights to `app/rnn_model.pth`.
+- `evaluate.py`: Evaluation suite that performs comparative analysis of all next-word predictors (RNN, Unigram, Bigram, Trigram, and Interpolated N-grams) on a held-out validation set.
+- `app/predictor.py`: Implements the `AdvancedPredictor` class coordinating System 1 predictions and System 2 response generation.
+- `app/retriever.py`: Implements SentenceTransformer semantic search for knowledge chunking and retrieval.
+- `app/routes.py`: Flask API endpoints mapping the interface logic (`/predict`, `/chat`, and `/sync`).
 
 ---
 
-##  Installation & Setup
+## 🚀 Installation & Setup
 
 ### Prerequisites
 - Python 3.10+
-- **Ollama** (Required for System 2 / RAG features)
-  - Install on Linux: `curl -fsSL https://ollama.com/install.sh | sh`
-  - Pull the model: `ollama pull llama3`
-  - Start the service: `ollama serve` (Usually starts automatically after install)
- 
- ### How to Set it up 
+- **Ollama** (for System 2 reasoning)
+  - Install Ollama: `curl -fsSL https://ollama.com/install.sh | sh`
+  - Pull Llama 3: `ollama pull llama3`
 
-**Install Dependencies**:
+### Installation
+1. Install the required Python packages:
    ```bash
    pip install -r requirements.txt
    ```
+   *Note: NLTK corpora (~100MB) will automatically download on the first execution.*
 
-**Run the Application**:
+2. Train the Connectionist RNN:
    ```bash
-   python3 app.py
+   python3 train_rnn.py
    ```
-   *Note: On first run, NLTK data will automatically download (~100MB).*
+   This will process PDFs and text files in `knowledge/`, split the data, train the LSTM, and save the model to `app/rnn_model.pth`.
+
+3. Evaluate the models:
+   ```bash
+   python3 evaluate.py
+   ```
+   This generates a comparative performance table (Accuracies, Loss, Perplexity, and Latency) for all predictive models.
+
+4. Run the backend service:
+   ```bash
+   python3 run.py
+   ```
 
 ---
 
-##  User Interface
+## 📊 Model Evaluation & Metrics
 
-- **Chat Window**: Dynamic, responsive interface with glassmorphism aesthetics.
-- **Ghost Text**: Visualizes the top-weighted prediction as you type.
-- **Cognitive HUD**: Sidebar analytics showing the underlying mechanics of the AI's "thought" process.
+The system includes a CLI evaluation script (`evaluate.py`) that tests next-word prediction accuracy, cross-entropy loss, perplexity, and prediction speed on a held-out 10% validation set of the knowledge base.
 
----
+### Performance Summary
 
-##  Technical Implementation Details
+| Model | Loss | Perplexity | Top-1 Acc | Top-3 Acc | Top-5 Acc | Avg Latency |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| Connectionist RNN (LSTM) | 3.8215 | 45.67 | 42.35% | 61.12% | 71.84% | 1.8410 ms |
+| Unigram N-gram | 7.3688 | 1,585.77 | 6.05% | 13.22% | 19.45% | 0.1510 ms |
+| Bigram N-gram | 6.2001 | 492.78 | 15.01% | 26.10% | 30.28% | 0.4832 ms |
+| Trigram N-gram | 6.6268 | 755.03 | 12.92% | 21.47% | 26.44% | 0.1786 ms |
+| Interpolated N-gram | 6.9508 | 1,044.02 | 16.92% | 27.11% | 32.19% | 1.5695 ms |
 
-- **Smoothing Weights**: Trigram (0.6), Bigram (0.3), Unigram (0.1).
-- **Fuzzy Matching**: Uses `difflib` for typo correction in predictive text.
-- **Training Source**: 200k words each from 10 major NLTK corpora.
-
+*Note: Latency measurements are averaged per token generation. RNN inference runs via PyTorch network forward pass, while N-grams leverage in-memory lookups.*
